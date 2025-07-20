@@ -1,6 +1,22 @@
 import React, { useMemo } from "react";
 import styled, { css } from "styled-components";
 
+const Button = styled.button`
+  background: linear-gradient(45deg, ${props => props.theme.primary}, ${props => props.theme.secondary});
+  color: white;
+  border: none;
+  border-radius: 20px;      // Mais arredondado
+  padding: 12px 25px;
+  font-size: 1em;
+  font-weight: bold;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);    // Sombra mais definida
+  transition: transform 0.2s;
+
+  &:hover {
+    transform: translateY(-2px);            // Leve elevação ao passar o mouse
+  }
+`
+
 // Estilos dos elementos
 const Table = styled.table`
   width: 100%;
@@ -117,9 +133,9 @@ export default function Calendar({
   return (
     <div style={{ maxWidth: 410 }}>
       <MonthNav>
-        <button onClick={() => onMonthChange(-1)}>{"<"}</button>
+        <Button onClick={() => onMonthChange(-1)}>{"<"}</Button>
         <b style={{ fontSize: "1.2em" }}>{monthNames[month]} {year}</b>
-        <button onClick={() => onMonthChange(+1)}>{">"}</button>
+        <Button onClick={() => onMonthChange(+1)}>{">"}</Button>
       </MonthNav>
       <Table>
         <Header>

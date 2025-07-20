@@ -3,6 +3,23 @@ import api from "../services/api";
 import styled from "styled-components";
 import UserList from "./UserList";
 import AppointmentList from "./AppointmentList";
+import styled from "styled-components";
+
+const Button = styled.button`
+  background: linear-gradient(45deg, ${props => props.theme.primary}, ${props => props.theme.secondary});
+  color: white;
+  border: none;
+  border-radius: 20px;      // Mais arredondado
+  padding: 12px 25px;
+  font-size: 1em;
+  font-weight: bold;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);    // Sombra mais definida
+  transition: transform 0.2s;
+
+  &:hover {
+    transform: translateY(-2px);            // Leve elevação ao passar o mouse
+  }
+`
 
 const CardForm = styled.div`
   background: #fffbe7;
@@ -63,7 +80,7 @@ export default function AdminDashboard({ onLogout }) {
         <input placeholder="Nome" value={newUser.nome} onChange={e => setNewUser({...newUser, nome:e.target.value})} required style={{marginRight:6}}/>
         <input placeholder="Email" value={newUser.email} onChange={e => setNewUser({...newUser, email:e.target.value})} required style={{marginRight:6}}/>
         <input placeholder="Senha" value={newUser.senha} type="password" onChange={e => setNewUser({...newUser, senha:e.target.value})} required style={{marginRight:6}}/>
-        <button type="submit">Criar Usuário</button>
+        <Button type="submit">Criar Usuário</Button>
       </CardForm>
       <h3>Usuários</h3>
       <UserList

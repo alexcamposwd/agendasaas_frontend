@@ -5,6 +5,23 @@ import Calendar from "./Calendar";
 import UserConfig from "./UserConfig";
 import ServiceConfig from "./ServiceConfig";
 import AppointmentConfig from "./AppointmentConfig";
+import styled from "styled-components";
+
+const Button = styled.button`
+  background: linear-gradient(45deg, ${props => props.theme.primary}, ${props => props.theme.secondary});
+  color: white;
+  border: none;
+  border-radius: 20px;      // Mais arredondado
+  padding: 12px 25px;
+  font-size: 1em;
+  font-weight: bold;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);    // Sombra mais definida
+  transition: transform 0.2s;
+
+  &:hover {
+    transform: translateY(-2px);            // Leve elevação ao passar o mouse
+  }
+`
 
 export default function UserDashboard({ onLogout }) {
   const [appts, setAppts] = useState([]);
@@ -90,7 +107,7 @@ export default function UserDashboard({ onLogout }) {
       />
       <h3 style={{marginTop:32}}>Agendamentos</h3>
       <AppointmentList appointments={appts} onRemove={async (id) => { await api.delete(`/appointments/${id}`); fetch(); }} />
-      <button onClick={sair} style={{ marginTop: 20 }}>Sair</button>
+      <Button onClick={sair} style={{ marginTop: 20 }}>Sair</Button>
     </div>
   );
 }

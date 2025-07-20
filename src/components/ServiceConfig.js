@@ -1,5 +1,22 @@
 import React, { useState, useEffect } from "react";
 import api from "../services/api";
+import styled from "styled-components";
+
+const Button = styled.button`
+  background: linear-gradient(45deg, ${props => props.theme.primary}, ${props => props.theme.secondary});
+  color: white;
+  border: none;
+  border-radius: 20px;      // Mais arredondado
+  padding: 12px 25px;
+  font-size: 1em;
+  font-weight: bold;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);    // Sombra mais definida
+  transition: transform 0.2s;
+
+  &:hover {
+    transform: translateY(-2px);            // Leve elevação ao passar o mouse
+  }
+`
 
 export default function ServiceConfig() {
   const [servicos, setServicos] = useState([]);
@@ -32,7 +49,7 @@ export default function ServiceConfig() {
         <input type="number" placeholder="Duração (min)" value={novo.duracao}
           onChange={e => setNovo({ ...novo, duracao: Math.max(1,+e.target.value) })}
           min={1} required style={{ width: 80, marginRight:5 }}/>
-        <button type="submit">Adicionar</button>
+        <Button type="submit">Adicionar</Button>
       </form>
       <ul style={{ padding: 0 }}>
         {servicos.map((s, idx) => (
@@ -40,7 +57,7 @@ export default function ServiceConfig() {
             background: '#fafafa', marginBottom: 7, padding: 7, borderRadius: 4
           }}>
             <b>{s.nome}</b> - {s.duracao} min
-            <button type="button" onClick={() => remover(idx)} style={{marginLeft:10}}>Remover</button>
+            <Button type="Button" onClick={() => remover(idx)} style={{marginLeft:10}}>Remover</button>
           </li>
         ))}
       </ul>

@@ -1,6 +1,22 @@
 import React from "react";
 import styled from "styled-components";
 
+const Button = styled.button`
+  background: linear-gradient(45deg, ${props => props.theme.primary}, ${props => props.theme.secondary});
+  color: white;
+  border: none;
+  border-radius: 20px;      // Mais arredondado
+  padding: 12px 25px;
+  font-size: 1em;
+  font-weight: bold;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);    // Sombra mais definida
+  transition: transform 0.2s;
+
+  &:hover {
+    transform: translateY(-2px);            // Leve elevação ao passar o mouse
+  }
+`
+
 const List = styled.ul`
   list-style: none;
   margin: 0;
@@ -35,16 +51,16 @@ export default function UserList({ users, onBlockToggle, onDelete, onViewAgenda 
             }}>{u.status}</span>
           </div>
           <Actions>
-            <button onClick={() => onBlockToggle(u._id, u.status)}>
+            <Button onClick={() => onBlockToggle(u._id, u.status)}>
               {u.status === "ativo" ? "Bloquear" : "Liberar"}
-            </button>
-            <button onClick={() => onDelete(u._id)}>
+            </Button>
+            <Button onClick={() => onDelete(u._id)}>
               Excluir
-            </button>
+            </Button>
             {onViewAgenda && (
-              <button onClick={() => onViewAgenda(u._id)}>
+              <Button onClick={() => onViewAgenda(u._id)}>
                 Ver Agenda
-              </button>
+              </Button>
             )}
           </Actions>
         </Item>

@@ -1,6 +1,22 @@
 import React from "react";
 import styled from "styled-components";
 
+const Button = styled.button`
+  background: linear-gradient(45deg, ${props => props.theme.primary}, ${props => props.theme.secondary});
+  color: white;
+  border: none;
+  border-radius: 20px;      // Mais arredondado
+  padding: 12px 25px;
+  font-size: 1em;
+  font-weight: bold;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);    // Sombra mais definida
+  transition: transform 0.2s;
+
+  &:hover {
+    transform: translateY(-2px);            // Leve elevação ao passar o mouse
+  }
+`
+
 // Lista e cards com visual mobile e agradável
 const List = styled.ul`
   list-style: none;
@@ -65,7 +81,9 @@ export default function AppointmentList({ appointments, onRemove, onStatus, admi
               {"  •  "}
               🕒 <b>{appt.hora}</b>
               {appt.servico?.duracao &&
-                <> — <span>Duração: <b>{durToText(appt.servico.duracao)}</b></span></>
+                <div>
+                  Duração: <b>{durToText(appt.servico.duracao)}</b>
+                </div>
               }
             </div>
             <div style={{fontSize:"0.95em"}}>
@@ -74,7 +92,7 @@ export default function AppointmentList({ appointments, onRemove, onStatus, admi
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
             {onRemove && (
-              <button onClick={() => onRemove(appt._id)} style={{background:"#fff", color:"#c2185b", border:"1px solid #ce93d8"}}>Remover</button>
+              <Button onClick={() => onRemove(appt._id)} style={{background:"#fff", color:"#c2185b", border:"1px solid #ce93d8"}}>Remover</Button>
             )}
           </div>
         </Card>

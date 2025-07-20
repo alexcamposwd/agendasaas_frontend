@@ -1,5 +1,22 @@
 import React, { useState, useEffect } from "react";
 import api from "../services/api";
+import styled from "styled-components";
+
+const Button = styled.button`
+  background: linear-gradient(45deg, ${props => props.theme.primary}, ${props => props.theme.secondary});
+  color: white;
+  border: none;
+  border-radius: 20px;      // Mais arredondado
+  padding: 12px 25px;
+  font-size: 1em;
+  font-weight: bold;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);    // Sombra mais definida
+  transition: transform 0.2s;
+
+  &:hover {
+    transform: translateY(-2px);            // Leve elevação ao passar o mouse
+  }
+`
 
 export default function UserConfig() {
   const [inicio, setInicio] = useState("07:00");
@@ -27,12 +44,16 @@ export default function UserConfig() {
   return (
     <form style={{ marginBottom: 24 }} onSubmit={salvar}>
       <h4>Horários de Atendimento</h4>
-      <div>
-        Início: <input type="time" value={inicio} onChange={e => setInicio(e.target.value)} required />
-          Fim: <input type="time" value={fim} onChange={e => setFim(e.target.value)} required />
-         <button type="submit">Salvar</button>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+        <div>
+          Início: <input type="time" value={inicio} onChange={e => setInicio(e.target.value)} required />
+        </div>
+        <div>
+          Fim: <input type="time" value={fim} onChange={e => setFim(e.target.value)} required />
+        </div>
+        <button type="submit" style={{ marginTop: 10 }}>Salvar</button>
       </div>
-      {msg && <span style={{color:"green", marginLeft:7}}>{msg}</span>}
-    </form>
+      {msg && <span style={{ color: "green", marginLeft: 7 }}>{msg}</span>}
+    </form>                   
   );
 }

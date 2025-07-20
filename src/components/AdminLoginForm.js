@@ -1,6 +1,23 @@
 import React, { useState } from "react";
 import api from "../services/api";
 import { useNavigate } from "react-router-dom";
+import styled from "styled-components";
+
+const Button = styled.button`
+  background: linear-gradient(45deg, ${props => props.theme.primary}, ${props => props.theme.secondary});
+  color: white;
+  border: none;
+  border-radius: 20px;      // Mais arredondado
+  padding: 12px 25px;
+  font-size: 1em;
+  font-weight: bold;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);    // Sombra mais definida
+  transition: transform 0.2s;
+
+  &:hover {
+    transform: translateY(-2px);            // Leve elevação ao passar o mouse
+  }
+`
 
 export default function AdminLoginForm() {
   const [password, setPassword] = useState("");
@@ -30,10 +47,10 @@ export default function AdminLoginForm() {
         required
         style={{ width: "100%", marginBottom: 12, height: 32 }}
       />
-      <button type="submit" style={{ width: "100%" }}>Entrar</button>
+      <Button type="submit" style={{ width: "100%" }}>Entrar</Button>
       {erro && <div style={{color:'red'}}>{erro}</div>}
       <p>
-        <button type="button" onClick={() => navigate("/")} style={{marginTop:12}}>Voltar</button>
+        <Button type="button" onClick={() => navigate("/")} style={{marginTop:12}}>Voltar</Button>
       </p>
     </form>
   );

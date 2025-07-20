@@ -3,8 +3,8 @@ import { createGlobalStyle } from "styled-components";
 export const themes = {
   light: {
     background: "#fff",
-    primary: "#7C4DFF",
-    secondary: "#F06292",
+    primary: "#8E24AA",
+    secondary: "#F48FB1",
     text: "#222",
     card: "#fffdfa",
     border: "#eeeeee",
@@ -12,8 +12,8 @@ export const themes = {
   },
   dark: {
     background: "#222",
-    primary: "#FFD700",
-    secondary: "#FF69B4",
+    primary: "#FFEA00",
+    secondary: "#F06292",
     text: "#fff",
     card: "#282828",
     border: "#444",
@@ -22,9 +22,11 @@ export const themes = {
 };
 
 const GlobalStyle = createGlobalStyle`
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap');
+
   body {
     margin: 0;
-    font-family: 'Inter', 'Roboto', Arial, Helvetica, sans-serif;
+    font-family: 'Inter', 'Roboto', Arial, Helvetica, 'Montserrat', sans-serif;
     background: ${({theme}) => theme.background};
     color: ${({theme}) => theme.text};
     min-height: 100vh;

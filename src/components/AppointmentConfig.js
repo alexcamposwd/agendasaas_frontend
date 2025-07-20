@@ -148,10 +148,11 @@ export default function AppointmentConfig({
         hora: horaEscolhida,
       });
       setMsg("Agendado com sucesso!");
+      setNome(""); // <== Adicione esta linha para limpar o nome
       setTimeout(() => {
         setMsg("");
         onAgendado();
-      }, 1200);
+      }, 800);
     } catch (err) {
       setErro(err.response?.data?.erro || "Erro ao agendar");
     }
@@ -224,17 +225,17 @@ const Input = styled.input`
 `;
 
 const Button = styled.button`
-  width: 100%;
-  border-radius: 10px;
-  padding: 12px;
-  background: linear-gradient(90deg, ${({ theme }) => theme.primary}, ${({ theme }) => theme.secondary} 94%);
-  color: #fff;
-  font-weight: bold;
+  background: linear-gradient(45deg, ${props => props.theme.primary}, ${props => props.theme.secondary});
+  color: white;
   border: none;
-  box-shadow: 0 1px 6px 0 rgba(124,77,255,0.09);
-  font-size: 1.03em;
-  margin-top: 8px;
-  transition: filter 0.18s;
-  &:active { filter: brightness(0.93);}
-  &:disabled { background:#eee; color:#aaa; }
-`;
+  border-radius: 20px;      // Mais arredondado
+  padding: 12px 25px;
+  font-size: 1em;
+  font-weight: bold;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);    // Sombra mais definida
+  transition: transform 0.2s;
+
+  &:hover {
+    transform: translateY(-2px);            // Leve elevação ao passar o mouse
+  }
+`
