@@ -57,7 +57,7 @@ export default function ServiceConfig() {
             background: '#fafafa', marginBottom: 7, padding: 7, borderRadius: 4
           }}>
             <b>{s.nome}</b> - {s.duracao} min
-            <Button type="Button" onClick={() => remover(idx)} style={{marginLeft:10}}>Remover</button>
+            <Button type="Button" onClick={() => remover(idx)} style={{marginLeft:10}}>Remover</Button>
           </li>
         ))}
       </ul>

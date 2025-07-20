@@ -16,6 +16,7 @@ const ConfigButton = styled(Link)`
   border: none;
   cursor: pointer;
   text-decoration: none;
+  z-index: 1; /* Garante que o botão fique acima de outros elementos */
 `;
 
 const Button = styled.button`
@@ -90,7 +91,7 @@ export default function UserCalendarPage() {
   }
 
   return (
-    <div style={{ maxWidth: 490, margin: "25px auto", position: "relative" }}>
+    <div style={{ maxWidth: 490, margin: "25px auto", position: "relative", paddingRight: 50, }}>
       <ConfigButton to="/config" aria-label="Configurações">
         ⚙️
       </ConfigButton>

@@ -3,7 +3,6 @@ import api from "../services/api";
 import styled from "styled-components";
 import UserList from "./UserList";
 import AppointmentList from "./AppointmentList";
-import styled from "styled-components";
 
 const Button = styled.button`
   background: linear-gradient(45deg, ${props => props.theme.primary}, ${props => props.theme.secondary});
