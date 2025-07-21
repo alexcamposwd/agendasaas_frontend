@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import api from "../services/api";
 import styled from "styled-components";
 
@@ -6,7 +6,7 @@ import styled from "styled-components";
 const Card = styled.form`
   background: ${({ theme }) => theme.card};
   border-radius: 16px;
-  box-shadow: 0 2px 12px rgba(124,77,255,0.07);
+  box-shadow: 0 2px 12px rgba(124, 77, 255, 0.07);
   padding: 22px 16px 16px 16px;
   max-width: 380px;
   width: 98vw;
@@ -33,16 +33,14 @@ const HoraBtn = styled.button`
     ocupado
       ? "#fde0ef"
       : selected
-      ? `linear-gradient(90deg,${theme.primary},${theme.secondary} 92%)`
-      : theme.card
-  };
+      ? `linear-gradient(90deg, ${theme.primary}, ${theme.secondary} 92%)`
+      : theme.card};
   color: ${({ ocupado, selected, theme }) =>
     ocupado
       ? "#bbb"
       : selected
       ? "#fff"
-      : theme.primary
-  };
+      : theme.primary};
   opacity: ${({ ocupado }) => (ocupado ? 0.5 : 1)};
   font-weight: 500;
   cursor: ${({ ocupado }) => (ocupado ? "not-allowed" : "pointer")};
@@ -70,7 +68,7 @@ export default function AppointmentConfig({
   dataAgendamento,
   onAgendado,
   servicos,
-  horarioAtendimento
+  horarioAtendimento,
 }) {
   const [servico, setServico] = useState(servicos[0]?.nome || "");
   const [apptsDia, setApptsDia] = useState([]);
@@ -79,19 +77,35 @@ export default function AppointmentConfig({
   const [msg, setMsg] = useState("");
   const [erro, setErro] = useState("");
 
-  useEffect(() => {
-    if (!dataAgendamento) return;
-    api.get("/appointments/by-date", { params: { data: dataAgendamento } }).then(r => setApptsDia(r.data));
-    setHoraEscolhida("");
-    setServico(servicos[0]?.nome || "");
-  }, [dataAgendamento, servicos]);
+  // Utilitários
+  const timeToMinutes = useCallback((time) => {
+    const [h, m] = time.split(":").map(Number);
+    return h * 60 + m;
+  }, []);
 
-  if (!dataAgendamento || !servicos.length) return null; // Só aparece se há serviço e data.
+  // Função para buscar agendamentos do dia
+  const fetchAppointments = useCallback(async () => {
+    if (!dataAgendamento) return;
+    try {
+      const { data } = await api.get("/appointments/by-date", {
+        params: { data: dataAgendamento },
+      });
+      setApptsDia(data);
+    } catch (error) {
+      console.error("Erro ao buscar agendamentos do dia:", error);
+      setErro("Erro ao carregar horários");
+    }
+  }, [api, dataAgendamento]);
 
   // Gera a grade de horários do dia selecionado, considerando bloqueios
-  function gerarHorarios() {
-    if (!horarioAtendimento?.inicio || !horarioAtendimento?.fim || !servicos.length) return [];
-    const serv = servicos.find(s => s.nome === servico);
+  const gerarHorarios = useCallback(() => {
+    if (
+      !horarioAtendimento?.inicio ||
+      !horarioAtendimento?.fim ||
+      !servicos.length
+    )
+      return [];
+    const serv = servicos.find((s) => s.nome === servico);
     if (!serv) return [];
     const step = 15;
     const [hi, mi] = horarioAtendimento.inicio.split(":").map(Number);
@@ -103,29 +117,118 @@ export default function AppointmentConfig({
     const dmax = new Date();
     dmax.setHours(hf, mf, 0, 0);
     while (d.getHours() * 60 + d.getMinutes() <= hf * 60 + mf) {
-      horariosGrade.push(`${String(d.getHours()).padStart(2,0)}:${String(d.getMinutes()).padStart(2,0)}`);
+      horariosGrade.push(
+        `${String(d.getHours()).padStart(2, 0)}:${String(
+          d.getMinutes()
+        ).padStart(2, 0)}`
+      );
       d = new Date(d.getTime() + step * 60000);
     }
     // Bloqueia ocupados do dia pelos agendamentos existentes
     const bloqueados = [];
-    apptsDia.forEach(a => {
+    apptsDia.forEach((a) => {
       const ini = timeToMinutes(a.hora);
       const dur = a.servico?.duracao || 0;
       for (let t = ini; t < ini + dur; t += step) {
-        bloqueados.push(`${String(Math.floor(t/60)).padStart(2,0)}:${String(t%60).padStart(2,0)}`);
+        bloqueados.push(
+          `${String(Math.floor(t / 60)).padStart(2, 0)}:${String(
+            t % 60
+          ).padStart(2, 0)}`
+        );
       }
     });
 
-    return horariosGrade.map(h => ({
+    return horariosGrade.map((h) => ({
       hora: h,
-      ocupado: bloqueados.includes(h)
+      ocupado: bloqueados.includes(h),
     }));
-  }
+  }, [
+    apptsDia,
+    horarioAtendimento?.fim,
+    horarioAtendimento?.inicio,
+    servico,
+    servicos,
+    timeToMinutes,
+  ]);
+
+  useEffect(() => {
+    fetchAppointments();
+  }, [fetchAppointments]);
+
+  useEffect(() => {
+    gerarHorarios();
+  }, [gerarHorarios]);
+
+  const renderContent = () => {
+    if (!dataAgendamento || !servicos.length) return null;
+
+    const horarios = gerarHorarios();
+
+    return (
+      <Card onSubmit={agendar}>
+        <div
+          style={{
+            marginBottom: 9,
+            textAlign: "center",
+            color: "#8E24AA",
+          }}
+        >
+          <b>Agendar para {dataAgendamento.replace(/-/g, "/")}</b>
+        </div>
+        <Input
+          value={nome}
+          onChange={(e) => setNome(e.target.value)}
+          placeholder="Seu nome (opcional)"
+        />
+        <select
+          value={servico}
+          onChange={(e) => setServico(e.target.value)}
+          style={{
+            width: "100%",
+            marginBottom: 7,
+            fontSize: "1.03em",
+            padding: "9px 7px",
+            borderRadius: 10,
+            border: `1.2px solid #ce93d8`,
+          }}
+        >
+          {servicos.map((s, idx) => (
+            <option key={idx} value={s.nome}>
+              {s.nome} — {s.duracao}min
+            </option>
+          ))}
+        </select>
+        <div style={{ marginBottom: 3, fontWeight: 600 }}>
+          Escolha um horário:
+        </div>
+        <HorarioGrid>
+          {horarios.map((h, idx) => (
+            <HoraBtn
+              type="button"
+              key={idx}
+              ocupado={h.ocupado}
+              selected={h.hora === horaEscolhida}
+              onClick={() => !h.ocupado && setHoraEscolhida(h.hora)}
+              tabIndex={h.ocupado ? -1 : 0}
+            >
+              {h.hora}
+            </HoraBtn>
+          ))}
+        </HorarioGrid>
+        <Button type="submit" disabled={!horaEscolhida}>
+          Agendar
+        </Button>
+        {erro && <ErrorMsg>{erro}</ErrorMsg>}
+        {msg && <SuccessMsg>{msg}</SuccessMsg>}
+      </Card>
+    );
+  };
 
   async function agendar(e) {
     e.preventDefault();
-    setMsg(""); setErro("");
-    const serv = servicos.find(s => s.nome === servico);
+    setMsg("");
+    setErro("");
+    const serv = servicos.find((s) => s.nome === servico);
     if (!serv || !horaEscolhida) return setErro("Escolha todos os campos!");
     try {
       await api.post("/appointments", {
@@ -139,66 +242,13 @@ export default function AppointmentConfig({
       setTimeout(() => {
         setMsg("");
         onAgendado();
-      }, 800);
+      }, 1200);
     } catch (err) {
       setErro(err.response?.data?.erro || "Erro ao agendar");
     }
   }
 
-  const horarios = gerarHorarios();
-
-  return (
-    <Card onSubmit={agendar}>
-      <div style={{ marginBottom: 9, textAlign: "center", color: "#8E24AA" }}>
-        <b>
-          Agendar para {dataAgendamento.replace(/-/g, '/')}
-        </b>
-      </div>
-      <Input
-        value={nome}
-        onChange={e => setNome(e.target.value)}
-        placeholder="Seu nome (opcional)"
-      />
-      <select
-        value={servico}
-        onChange={e => setServico(e.target.value)}
-        style={{
-          width: '100%',
-          marginBottom: 7,
-          fontSize: "1.03em",
-          padding: "9px 7px",
-          borderRadius: 10,
-          border: `1.2px solid #ce93d8`
-        }}
-      >
-        {servicos.map((s, idx) => (
-          <option key={idx} value={s.nome}>
-            {s.nome} — {s.duracao}min
-          </option>
-        ))}
-      </select>
-      <div style={{ marginBottom: 3, fontWeight: 600 }}>
-        Escolha um horário:
-      </div>
-      <HorarioGrid>
-        {horarios.map((h, idx) => (
-          <HoraBtn
-            type="button"
-            key={idx}
-            ocupado={h.ocupado}
-            selected={h.hora === horaEscolhida}
-            onClick={() => !h.ocupado && setHoraEscolhida(h.hora)}
-            tabIndex={h.ocupado ? -1 : 0}
-          >
-            {h.hora}
-          </HoraBtn>
-        ))}
-      </HorarioGrid>
-      <Button type="submit" disabled={!horaEscolhida}>Agendar</Button>
-      {erro && <ErrorMsg>{erro}</ErrorMsg>}
-      {msg && <SuccessMsg>{msg}</SuccessMsg>}
-    </Card>
-  );
+  return renderContent();
 }
 
 // Input e Button estilos reaproveitados de outros componentes:
@@ -212,17 +262,28 @@ const Input = styled.input`
 `;
 
 const Button = styled.button`
-  background: linear-gradient(45deg, ${props => props.theme.primary}, ${props => props.theme.secondary});
-  color: white;
-  border: none;
-  border-radius: 20px;      // Mais arredondado
-  padding: 12px 25px;
-  font-size: 1em;
+  width: 100%;
+  border-radius: 10px;
+  padding: 12px;
+  background: linear-gradient(
+    90deg,
+    ${({ theme }) => theme.primary},
+    ${({ theme }) => theme.secondary} 94%
+  );
+  color: #fff;
   font-weight: bold;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);    // Sombra mais definida
-  transition: transform 0.2s;
-
-  &:hover {
-    transform: translateY(-2px);            // Leve elevação ao passar o mouse
+  border: none;
+  box-shadow: 0 1px 6px 0 rgba(124, 77, 255, 0.09);
+  font-size: 1.03em;
+  margin-top: 8px;
+  transition: filter 0.18s;
+  &:active {
+    filter: brightness(0.93);
   }
-`
+  &:disabled {
+    background: #eee;
+    color: #aaa;
+  }
+`;
+
+
