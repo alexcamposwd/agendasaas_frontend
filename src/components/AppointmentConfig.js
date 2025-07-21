@@ -95,7 +95,7 @@ export default function AppointmentConfig({
       console.error("Erro ao buscar agendamentos do dia:", error);
       setErro("Erro ao carregar horários");
     }
-  }, [api, dataAgendamento]);
+  }, [dataAgendamento]);
 
   // Gera a grade de horários do dia selecionado, considerando bloqueios
   const gerarHorarios = useCallback(() => {

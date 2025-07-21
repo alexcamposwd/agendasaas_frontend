@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../services/api";
 import Calendar from "../components/Calendar";
@@ -19,22 +19,6 @@ const ConfigButton = styled(Link)`
   z-index: 1; /* Garante que o botão fique acima de outros elementos */
 `;
 
-const Button = styled.button`
-  background: linear-gradient(45deg, ${props => props.theme.primary}, ${props => props.theme.secondary});
-  color: white;
-  border: none;
-  border-radius: 20px;      // Mais arredondado
-  padding: 12px 25px;
-  font-size: 1em;
-  font-weight: bold;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);    // Sombra mais definida
-  transition: transform 0.2s;
-
-  &:hover {
-    transform: translateY(-2px);            // Leve elevação ao passar o mouse
-  }
-`
-
 export default function UserCalendarPage() {
   const [dataSelecionada, setDataSelecionada] = useState(null);
   const [cfg, setCfg] = useState({
@@ -54,20 +38,33 @@ export default function UserCalendarPage() {
     apptMap[a.data].push(a);
   });
 
+  // Função para buscar agendamentos de todo mês
+  const fetchAgendamentos = useCallback(async () => {
+    const mes = `${calY}-${String(calM + 1).padStart(2, '0')}`;
+    try {
+      const res = await api.get("/appointments/by-month", { params: { mes } });
+      setAgendamentosMes(res.data);
+    } catch (error) {
+      console.error("Erro ao buscar agendamentos do mês:", error);
+      // Lógica para lidar com o erro, se necessário
+    }
+  }, [calY, calM, api]);
+
   // Função para buscar configurações (serviços, horários)
   async function fetchConfig() {
-    const { data } = await api.get("/users/config");
-    setCfg(data);
+    try {
+      const { data } = await api.get("/users/config");
+      setCfg(data);
+    } catch (error) {
+      console.error("Erro ao buscar configurações:", error);
+      // Lógica para lidar com o erro, se necessário
+    }
   }
 
-  // Função para buscar agendamentos de todo mês
-  async function fetchAgendamentos() {
-    const mes = `${calY}-${String(calM + 1).padStart(2, '0')}`;
-    const res = await api.get("/appointments/by-month", { params: { mes } });
-    setAgendamentosMes(res.data);
-  }
-
-  useEffect(() => { fetchAgendamentos(); fetchConfig(); }, [calY, calM, fetchAgendamentos]);
+  useEffect(() => {
+    fetchAgendamentos();
+    fetchConfig();
+  }, [fetchAgendamentos]);
 
   function handleMonthChange(delta) {
     let ano = calY;
@@ -91,14 +88,19 @@ export default function UserCalendarPage() {
   }
 
   return (
-    <div style={{ maxWidth: 490, margin: "25px auto", position: "relative", paddingRight: 50, }}>
+    <div style={{
+      maxWidth: 490,
+      margin: "25px auto",
+      position: "relative",
+      paddingRight: 50,  /* Ajuste aqui para evitar sobreposição */
+    }}> {/* relative para posicionar o botão */}
       <ConfigButton to="/config" aria-label="Configurações">
         ⚙️
       </ConfigButton>
       <nav style={{ marginBottom: 20 }}>
-        <Link to="/dashboard"><button style={{marginRight:7}}>Calendário</button></Link>
+        <Link to="/dashboard"><button style={{ marginRight: 7 }}>Calendário</button></Link>
         <Link to="/agendamentos"><button>Agendamentos</button></Link>
-        <Button onClick={sair} style={{float:"right"}}>Sair</Button>
+        <button onClick={sair} style={{ float: "right" }}>Sair</button>
       </nav>
       <h2>Agendar Atendimento</h2>
       <Calendar
@@ -121,4 +123,5 @@ export default function UserCalendarPage() {
     </div>
   );
 }
+
 
