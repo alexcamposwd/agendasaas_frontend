@@ -48,7 +48,7 @@ export default function UserCalendarPage() {
       console.error("Erro ao buscar agendamentos do mês:", error);
       // Lógica para lidar com o erro, se necessário
     }
-  }, [calY, calM, api]);
+  }, [calY, calM]);
 
   // Função para buscar configurações (serviços, horários)
   async function fetchConfig() {
