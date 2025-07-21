@@ -88,19 +88,6 @@ export default function AppointmentConfig({
 
   if (!dataAgendamento || !servicos.length) return null; // Só aparece se há serviço e data.
 
-  // Utilitários
-  function addMinutesToTime(time, mins) {
-    const [h, m] = time.split(":").map(Number);
-    let date = new Date();
-    date.setHours(h, m, 0, 0);
-    date = new Date(date.getTime() + mins * 60000);
-    return `${String(date.getHours()).padStart(2,0)}:${String(date.getMinutes()).padStart(2,0)}`;
-  }
-  function timeToMinutes(time) {
-    const [h, m] = time.split(":").map(Number);
-    return h * 60 + m;
-  }
-
   // Gera a grade de horários do dia selecionado, considerando bloqueios
   function gerarHorarios() {
     if (!horarioAtendimento?.inicio || !horarioAtendimento?.fim || !servicos.length) return [];

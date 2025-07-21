@@ -67,7 +67,7 @@ export default function UserCalendarPage() {
     setAgendamentosMes(res.data);
   }
 
-  useEffect(() => { fetchAgendamentos(); fetchConfig(); }, [calY, calM]);
+  useEffect(() => { fetchAgendamentos(); fetchConfig(); }, [calY, calM, fetchAgendamentos]);
 
   function handleMonthChange(delta) {
     let ano = calY;

@@ -43,17 +43,6 @@ const MainInfo = styled.div`
   font-size: 1.15em;
 `;
 
-// Tag de status
-const Tag = styled.span`
-  padding: 1px 10px;
-  background: ${({ pago, theme }) => pago ? theme.primary : theme.highlight};
-  color: ${({ pago }) => pago ? "#fff" : "#5a237e"};
-  border-radius: 5px;
-  font-size: 0.95em;
-  margin-left: 6px;
-  font-weight: 500;
-`;
-
 function durToText(mins) {
   const h = Math.floor(mins / 60);
   const m = mins % 60;

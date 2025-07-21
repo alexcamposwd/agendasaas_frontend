@@ -51,7 +51,7 @@ export default function UserConfig() {
         <div>
           Fim: <input type="time" value={fim} onChange={e => setFim(e.target.value)} required />
         </div>
-        <button type="submit" style={{ marginTop: 10 }}>Salvar</button>
+        <Button type="submit" style={{ marginTop: 10 }}>Salvar</Button>
       </div>
       {msg && <span style={{ color: "green", marginLeft: 7 }}>{msg}</span>}
     </form>                   

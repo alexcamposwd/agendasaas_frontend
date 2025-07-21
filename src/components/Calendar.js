@@ -75,12 +75,6 @@ function getDaysArray(year, month) {
   return arr;
 }
 
-// Transformar hora "HH:MM" em minutos
-function timeToMinutes(time) {
-  const [h, m] = time.split(":").map(Number);
-  return h * 60 + m;
-}
-
 // Função: retorna true se todos os slots do dia estão ocupados
 function dayFilled(appts, horarioAtendimento, servicos) {
   if (!horarioAtendimento || !servicos || servicos.length === 0) return false;
